@@ -1,0 +1,17 @@
+# Use an official Python runtime as the base image
+FROM python:3.12
+
+# Set environment variables for Python
+ENV PYTHONUNBUFFERED=1
+
+# Install required Python packages
+RUN pip install --no-cache-dir pandas pyarrow sdv fastparquet
+
+# Create a directory for the application
+WORKDIR /app
+
+# Copy the CTGAN synthesizer script into the container
+COPY ctgan_synthesizer.py /app/ctgan_synthesizer.py
+
+# Set the entry point to run the script
+ENTRYPOINT ["python", "ctgan_synthesizer.py"]

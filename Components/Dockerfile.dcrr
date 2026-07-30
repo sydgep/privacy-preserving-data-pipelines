@@ -1,0 +1,16 @@
+FROM python:3.12
+
+ENV PYTHONUNBUFFERED=1
+
+RUN pip install --no-cache-dir \
+    pandas \
+    pyarrow \
+    fastparquet \
+    numpy \
+    scikit-learn
+
+WORKDIR /app
+
+COPY dcr_evaluation.py /app/dcr_evaluation.py
+
+ENTRYPOINT ["python", "dcr_evaluation.py"]

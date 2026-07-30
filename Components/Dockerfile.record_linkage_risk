@@ -1,0 +1,11 @@
+FROM python:3.12
+
+ENV PYTHONUNBUFFERED=1
+
+RUN pip install --no-cache-dir pandas pyarrow fastparquet numpy
+
+WORKDIR /app
+
+COPY record_linkage_risk.py /app/record_linkage_risk.py
+
+ENTRYPOINT ["python", "record_linkage_risk.py"]

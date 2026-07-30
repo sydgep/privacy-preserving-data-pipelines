@@ -1,0 +1,11 @@
+FROM python:3.12
+
+ENV PYTHONUNBUFFERED=1
+
+RUN pip install --no-cache-dir pandas pyarrow fastparquet
+
+WORKDIR /app
+
+COPY l_diversity.py /app/l_diversity.py
+
+ENTRYPOINT ["python", "l_diversity.py"]
