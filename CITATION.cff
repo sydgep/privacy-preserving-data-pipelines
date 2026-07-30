@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+
+title: "Privacy-Preserving Framework"
+
+message: >
+  If you use this software, please cite it using the metadata below.
+
+type: software
+
+authors:
+
+  - family-names: Sani
+    given-names: Mukhtar
+
+repository-code: https://github.com/INSAFEDARE/privacy-preserving-framework
+
+license: Apache-2.0
+
+abstract: >
+  A modular and reproducible framework for constructing,
+  evaluating, and sharing privacy-preserving healthcare datasets
+  through anonymization, synthetic data generation,
+  privacy evaluation, statistical fidelity assessment,
+  and machine learning utility evaluation.
+
+keywords:
+
+  - healthcare
+  - privacy
+  - synthetic data
+  - anonymization
+  - Docker
+  - Prefect
+  - reproducibility
+  - machine learning
+
+version: 0.1.0
+
+date-released: 2026-07-30
+
