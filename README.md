@@ -1,6 +1,6 @@
 # Synthetic Data Generation and Evaluation Pipelines
 
-A modular and reproducible framework for developing and evaluating privacy-preserving healthcare datasets.
+A modular and reproducible framework for generating and evaluating synthetic healthcare datasets.
 
 The framework provides an end-to-end workflow encompassing data ingestion, preprocessing, de-identification, synthetic data generation, and multidimensional evaluation. Each operation is implemented as an independent Docker container, enabling reusable, portable, and reproducible execution. Individual components can be executed independently or integrated into complete data pipelines orchestrated using Prefect.
 
