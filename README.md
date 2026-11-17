@@ -1,55 +1,72 @@
+# Synthetic Data Generation and Evaluation Pipelines
 
-# Reproducible Synthetic Data Generation and Evaluation Pipelines
+A modular and reproducible framework for developing and evaluating privacy-preserving healthcare datasets.
 
-A modular and reproducible framework for constructing, evaluating, and sharing privacy-preserving healthcare datasets.
+The framework provides an end-to-end workflow encompassing data ingestion, preprocessing, de-identification, synthetic data generation, and multidimensional evaluation. Each operation is implemented as an independent Docker container, enabling reusable, portable, and reproducible execution. Individual components can be executed independently or integrated into complete data pipelines orchestrated using Prefect.
 
-The framework provides an end-to-end workflow that combines healthcare data preparation, direct identifier removal, anonymization, synthetic data generation, privacy evaluation, statistical fidelity assessment, and machine learning utility evaluation. Each operation is implemented as an independent Docker container and can be executed individually or orchestrated into complete workflows using Prefect.
-
-The primary objective of the framework is to facilitate reproducible research and trustworthy AI by providing reusable software components that enable researchers and practitioners to construct privacy-preserving healthcare datasets while preserving analytical value.
+The primary objective is to support reproducible research and the development of trustworthy, privacy-preserving healthcare datasets by providing reusable software components for data processing, synthetic data generation, and systematic evaluation of statistical fidelity, machine learning utility, and privacy-related risks.
 
 ---
 
 ## Features
 
-* Modular architecture
-* A set of reusable components
-* Docker-based task-containerization for reproducible execution
-* Prefect workflow orchestration and visualization
+- **Modular architecture:** Independent and reusable components for building customizable data pipelines.
+- **Task-level containerization:** Docker-based execution environments that promote portability, consistency, and reproducibility.
+- **Workflow orchestration:** Prefect-based execution, monitoring, and visualization of end-to-end data pipelines.
+- **Multiple generation methods:** Support for statistical, deep learning-based, and hybrid synthetic data generation techniques.
+- **Multidimensional evaluation:** Integrated assessment of statistical fidelity, predictive utility, and privacy-related disclosure risks.
+- **Extensibility:** A component-based design that facilitates the integration of additional privacy-preserving techniques, generation algorithms, and evaluation methods.
 
 ---
 
 ## Current Components
 
-These components can be executed independently or combined into complete end-to-end workflows.
+The framework provides reusable components that can be executed independently or combined into complete end-to-end workflows.
 
-### Data Preparation
+### 1. Data Preparation
 
-* Data ingestion
-* Data cleaning
-* Data splitting
-* De-identification
+- **Data Ingestion:** Extraction of tabular data from supported file formats, databases, and REST APIs.
+- **Data Cleaning:** Identification and handling of missing values.
+- **De-identification:** Removal of specified direct identifiers.
+- **Train/Test Splitting:** Partitioning datasets into training and testing subsets, with optional stratification.
 
-### Synthetic Data generation
+### 2. Synthetic Data Generation
 
-* Gaussian Copula
-* CTAGN
-* Copula GAN)
+The framework supports three complementary approaches to tabular synthetic data generation:
 
-### Privacy Evaluation
+- **Gaussian Copula:** A statistical model-based approach that captures marginal distributions and dependencies between variables.
+- **CTGAN:** A deep learning-based approach using conditional generative adversarial networks.
+- **CopulaGAN:** A hybrid approach combining statistical transformations with GAN-based synthetic data generation.
 
-* Singling-out attack
-* Linkability attack
-* Inference attack
- 
+### 3. Privacy Evaluation
 
-### Statistical Evaluation
+Privacy-related disclosure risks are assessed using the Anonymeter framework through three attack-based evaluations:
 
-* Jensen–Shannon distance
-* Peer-wise Correlation
+- **Singling-out:** Assesses the possibility of isolating individual records.
+- **Linkability:** Evaluates whether records can be linked using auxiliary information.
+- **Inference:** Assesses the possibility of inferring sensitive attributes from available information.
 
-### Machine Learning Utility
+The evaluation reports estimated privacy risks alongside attack success rates and baseline/control results.
 
-Supports both classification and regression tasks through automated preprocessing and standardized evaluation workflows.
+### 4. Statistical Fidelity Evaluation
+
+Statistical fidelity is assessed through two complementary measures:
+
+- **Distribution Similarity:** Measures similarity between real and synthetic feature distributions using Jensen–Shannon distance.
+- **Correlation Similarity:** Evaluates preservation of pairwise relationships using Spearman correlation, Cramér's V, and correlation ratio, depending on feature types.
+
+Both measures are expressed as similarity scores, where values closer to 100% indicate greater statistical similarity.
+
+### 5. Machine Learning Utility Evaluation
+
+Evaluates the extent to which synthetic datasets preserve information relevant to downstream machine learning tasks.
+
+The component supports classification and regression models and compares two experimental settings:
+
+- **Train on Real, Test on Real (TRTR):** Establishes predictive performance using real training data and held-out real test data.
+- **Train on Synthetic, Test on Real (TSTR):** Evaluates predictive performance when synthetic data replace real training data.
+
+The evaluation reports predictive performance metrics and retained utility relative to the real-data baseline.
 
 ---
 
@@ -65,10 +82,10 @@ Citation information will be added upon publication.
 
 This project is licensed under the Apache License 2.0.
 
-See the LICENSE file for details.
+See the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## Acknowledgements
 
-This work has been developed within the context of INSAFEDARE project
+This work has been developed within the context of the **INSAFEDARE** project, which aims to support high-assurance, data-driven decision-making in medical device regulation through privacy-preserving data technologies and associated evaluation methodologies.
