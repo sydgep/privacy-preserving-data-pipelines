@@ -1,5 +1,5 @@
 
-# Privacy-Preserving Framework
+# Reproducible Synthetic Data Generation and Evaluation Pipelines
 
 A modular and reproducible framework for constructing, evaluating, and sharing privacy-preserving healthcare datasets.
 
@@ -11,45 +11,10 @@ The primary objective of the framework is to facilitate reproducible research an
 
 ## Features
 
-* Modular architecture with independently executable components
-* Docker-based implementation for reproducible execution
-* Prefect workflow orchestration
-* Direct identifier removal
-* Healthcare data anonymization
-* Synthetic data generation using CTGAN, VAE and Gaussian Copula
-* Privacy evaluation
-  * k-anonymity
-  * l-diversity
-  * t-closeness
-  * Attribute inference attack
-  * Record linkage risk
-  * Distance-to-Closest Record (DCR)
-* Statistical fidelity evaluation
-
-  * Kolmogorov–Smirnov statistic
-  * Wasserstein distance
-  * Jensen–Shannon divergence
-* Machine learning utility evaluation
-
-  * Classification and regression support
-  * TrainReal_TestReal
-  * TrainSynth_TestReal
-* Reproducible workflows for multiple healthcare datasets
-
----
-
-## Repository Structure
-
-```text
-privacy-preserving-framework/
-├── components/             # Codes and Dockerfiles
-├── workflows/              # Prefect workflows
-├── datasets/               # Test datasets
-├── README.md
-├── LICENSE
-├── CITATION.cff
-└── CONTRIBUTING.md
-```
+* Modular architecture
+* A set of reusable components
+* Docker-based task-containerization for reproducible execution
+* Prefect workflow orchestration and visualization
 
 ---
 
@@ -61,27 +26,26 @@ These components can be executed independently or combined into complete end-to-
 
 * Data ingestion
 * Data cleaning
+* Data splitting
+* De-identification
 
-### Privacy-Preserving Transformation
+### Synthetic Data generation
 
-* Direct identifier removal
-* Anonymization
-* Synthetic data generators (CTGAN, VAE, Copula)
+* Gaussian Copula
+* CTAGN
+* Copula GAN)
 
 ### Privacy Evaluation
 
-* k-anonymity
-* l-diversity
-* t-closeness
-* Attribute inference attack
-* Record linkage risk
-* Distance-to-Closest Record
+* Singling-out attack
+* Linkability attack
+* Inference attack
+ 
 
 ### Statistical Evaluation
 
-* Kolmogorov–Smirnov statistic
-* Wasserstein distance
-* Jensen–Shannon divergence
+* Jensen–Shannon distance
+* Peer-wise Correlation
 
 ### Machine Learning Utility
 
@@ -91,7 +55,7 @@ Supports both classification and regression tasks through automated preprocessin
 
 ## Citation
 
-If you use this framework in your research, please cite the associated publication.
+If you use this framework or any of its components in your research, please cite the associated publication.
 
 Citation information will be added upon publication.
 
@@ -107,4 +71,4 @@ See the LICENSE file for details.
 
 ## Acknowledgements
 
-This work has been developed within the context of research on reproducible privacy-preserving healthcare data processing and trustworthy artificial intelligence.
+This work has been developed within the context of INSAFEDARE project
