@@ -14,15 +14,7 @@ The first two datasets are included in this repository for testing and demonstra
 
 # 1. Artificial Healthcare Dataset
 
-**File**
-
-```text
-data.csv
-```
-
 ### Description
-
-This synthetic dataset was created to provide a simple benchmark for demonstrating the framework's privacy-preserving workflow.
 
 It contains representative healthcare attributes including direct identifiers, quasi-identifiers, and sensitive attributes, allowing users to execute the complete framework without requiring access to real clinical data.
 
@@ -35,13 +27,7 @@ Typical use cases include:
 
 ---
 
-# 2. Breast Cancer Dataset (BRCA)
-
-**File**
-
-```text
-diabetes.csv
-```
+# 2. Diabetes Dataset
 
 ### Source
 
@@ -52,7 +38,6 @@ The dataset contains breast cancer patient information including demographic cha
 Within this framework, the dataset is used to demonstrate:
 
 * direct identifier removal
-* anonymization
 * synthetic data generation
 * privacy evaluation
 * statistical fidelity assessment
