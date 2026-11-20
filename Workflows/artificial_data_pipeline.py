@@ -360,7 +360,7 @@ def synthesization_pipeline():
         group_column="",
         seed=42,
     )
-"""
+
     # First Experiment: Gaussian Copula Synthesizer (A statistical model-based approach)
 
     copula_synthesizer(input_file="train_data.parquet", output_file="synthetic_data_copula.parquet")
@@ -461,6 +461,5 @@ def synthesization_pipeline():
         linkability_aux_cols_2="Admission_Date, Diagnosis, Treatment",
     )
 
-"""
 if __name__ == "__main__":
     synthesization_pipeline()
