@@ -1,40 +1,49 @@
+
 cff-version: 1.2.0
 
-title: "Privacy-Preserving Framework"
+title: "Privacy-Preserving Data Pipelines"
 
 message: >
-  If you use this software, please cite it using the metadata below.
+  If you use this software or its components in your research,
+  please cite it using the metadata provided below.
 
 type: software
 
 authors:
-
   - family-names: Sani
     given-names: Mukhtar
 
-repository-code: https://github.com/INSAFEDARE/privacy-preserving-framework
+repository-code: https://github.com/sydgep/privacy-preserving-data-pipelines
 
 license: Apache-2.0
 
 abstract: >
-  A modular and reproducible framework for constructing,
-  evaluating, and sharing privacy-preserving healthcare datasets
-  through anonymization, synthetic data generation,
-  privacy evaluation, statistical fidelity assessment,
-  and machine learning utility evaluation.
+  A modular and reproducible framework for developing
+  privacy-preserving data pipelines, with a focus on synthetic
+  data generation and multidimensional evaluation.
+  The framework provides reusable Docker-containerized
+  components for data ingestion, preprocessing,
+  de-identification, synthetic data generation,
+  statistical fidelity assessment, machine learning
+  utility evaluation, and privacy risk assessment.
+  Components can be executed independently or combined
+  into end-to-end workflows using Prefect orchestration.
+  The framework supports reproducible research and
+  facilitates the development and evaluation of
+  privacy-preserving healthcare datasets.
 
 keywords:
-
+  - privacy-preserving data
+  - synthetic data generation
   - healthcare
-  - privacy
-  - synthetic data
-  - anonymization
+  - statistical fidelity
+  - machine learning utility
+  - privacy evaluation
   - Docker
   - Prefect
+  - workflow orchestration
   - reproducibility
-  - machine learning
 
 version: 0.1.0
 
-date-released: 2026-07-30
-
+date-released: 2026-11-20
