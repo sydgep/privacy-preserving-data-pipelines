@@ -9,7 +9,7 @@ from prefect.artifacts import create_table_artifact
 # Directories
 # -----------------------------------------------------------------------------
 DATASET_DIR = "/homelocal/ms271520/INSAFEDARE/Datasets/Artificial"
-HOST_SHARED_DIR = "/homelocal/ms271520/INSAFEDARE/Datasets/outputs/artificial_data_pipeline"
+HOST_SHARED_DIR = "/homelocal/ms271520/INSAFEDARE/Datasets/outputs/artificial_2026_11_20_v2"
 os.makedirs(HOST_SHARED_DIR, exist_ok=True)
 
 
@@ -62,6 +62,10 @@ def create_parquet_artifact(file_name, key, description, n=20):
 
 def run_container(image, environment, logger):
     """Run a task container and fail the Prefect task on container errors."""
+
+    logger.info(f"Checking for the latest Docker image: {image}")
+    docker_client.images.pull(image)
+
     container = docker_client.containers.run(
         image=image,
         detach=True,
@@ -80,8 +84,7 @@ def run_container(image, environment, logger):
         raise RuntimeError(
             f"Container '{image}' failed with exit code {status_code}.\n{logs}"
         )
-
-
+    
 @task(name="Data Ingestion")
 def file_extraction(input_file, output_file, columns):
     logger = get_run_logger()
@@ -142,7 +145,7 @@ def data_cleaning(input_file, output_file):
     )
     
 @task(name="Train-Test Split")
-def train_test_split(input_file, output_file_train, output_file_test, train_size, stratify, seed):
+def train_test_split(input_file, output_file_train, output_file_test, train_size, stratify, stratify_method, group_column,seed):
     logger = get_run_logger()
 
     run_container(
@@ -153,6 +156,8 @@ def train_test_split(input_file, output_file_train, output_file_test, train_size
             "container_output_test": f"{CONTAINER_OUTPUT_DIR}/{output_file_test}",
             "train_size": train_size,
             "stratify": stratify,
+            "stratify_method": stratify_method,
+            "group_column": group_column,
             "seed": seed,
         },
         logger=logger,
@@ -351,9 +356,11 @@ def synthesization_pipeline():
         output_file_test="test_data.parquet",
         train_size=0.7,
         stratify="Outcome",
+        stratify_method="max",
+        group_column="",
         seed=42,
     )
-
+"""
     # First Experiment: Gaussian Copula Synthesizer (A statistical model-based approach)
 
     copula_synthesizer(input_file="train_data.parquet", output_file="synthetic_data_copula.parquet")
@@ -454,6 +461,6 @@ def synthesization_pipeline():
         linkability_aux_cols_2="Admission_Date, Diagnosis, Treatment",
     )
 
-
+"""
 if __name__ == "__main__":
     synthesization_pipeline()
