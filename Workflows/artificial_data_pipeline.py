@@ -8,8 +8,8 @@ from prefect.artifacts import create_table_artifact
 # -----------------------------------------------------------------------------
 # Directories
 # -----------------------------------------------------------------------------
-DATASET_DIR = "/homelocal/ms271520/INSAFEDARE/Datasets/Artificial"
-HOST_SHARED_DIR = "/homelocal/ms271520/INSAFEDARE/Datasets/outputs/artificial_2026_11_20_v2"
+DATASET_DIR = "/homelocal/path/to/Datasets/Artificial" # Update with the actual path to the dataset
+HOST_SHARED_DIR = "/homelocal/path/to/Datasets/outputs" # Update with your desired path to store outputs
 os.makedirs(HOST_SHARED_DIR, exist_ok=True)
 
 
