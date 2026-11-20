@@ -12,7 +12,6 @@ Before executing the pipeline, ensure that the following software is installed:
 
 - **Python 3.10 or later** (Python 3.11 or 3.12 recommended).
 - **Docker Engine or Docker Desktop**.
-- **Git** (recommended for downloading the repository).
 
 The Docker daemon must be running because the workflow uses the Docker Python SDK to create and execute containers.
 
@@ -32,23 +31,11 @@ The `docker info` command should complete successfully. If it reports that the D
 
 ## 2. Download the Dataset and Pipeline
 
-Clone the GitHub repository:
+Click to download: 
 
-```bash
-git clone https://github.com/<OWNER>/<REPOSITORY>.git
-cd <REPOSITORY>
-```
-
-Replace `<OWNER>` and `<REPOSITORY>` with the actual GitHub repository details.
-
-Alternatively, download the repository as a ZIP file using **Code → Download ZIP** on GitHub, then extract it.
-
-The repository includes:
-
-- `artificial_data_pipeline.py` — the executable Prefect workflow.
-- `data.csv` — the input dataset used in the experiments.
-
-No additional dataset download is required.
+[Artificial Dataset](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Datasets/data.csv)
+[Diabetes Dataset](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Datasets/diabetes_data.csv)
+[Prefect workflow](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Workflows/artificial_data_pipeline.py)
 
 ## 3. Create a Virtual Environment
 
