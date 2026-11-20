@@ -1,91 +1,257 @@
-# Synthetic Data Generation and Evaluation Pipelines
+# Reproducible Synthetic Data Generation and Evaluation Pipelines
 
-A modular and reproducible framework for generating and evaluating synthetic healthcare datasets.
+This guide provides step-by-step instructions for reproducing the synthetic data generation and evaluation experiments using Docker and Prefect.
 
-The framework provides an end-to-end workflow encompassing data ingestion, preprocessing, de-identification, synthetic data generation, and multidimensional evaluation. Each operation is implemented as an independent Docker container, enabling reusable, portable, and reproducible execution. Individual components can be executed independently or integrated into complete data pipelines orchestrated using Prefect.
+The workflow executes three experiments sequentially, using **Gaussian Copula, CTGAN, and CopulaGAN** to generate synthetic datasets. Each generated dataset is subsequently evaluated in terms of statistical fidelity, machine learning utility, and privacy-related risks.
 
-The primary objective is to support reproducible research and the development of trustworthy, privacy-preserving healthcare datasets by providing reusable software components for data processing, synthetic data generation, and systematic evaluation of statistical fidelity, machine learning utility, and privacy-related risks.
+All processing components are executed as independent Docker containers, while Prefect manages workflow orchestration, execution monitoring, and visualization.
+
+## 1. Prerequisites
+
+Before executing the pipeline, ensure that the following software is installed:
+
+- **Python 3.10 or later** (Python 3.11 or 3.12 recommended).
+- **Docker Engine or Docker Desktop**.
+
+The Docker daemon must be running because the workflow uses the Docker Python SDK to create and execute containers.
+
+Verify the installations:
+
+```bash
+python --version
+docker --version
+docker info
+```
+
+On some Linux and macOS systems, use `python3` instead of `python`.
+
+The `docker info` command should complete successfully. If it reports that the Docker daemon cannot be reached, ensure that Docker is running and that your user account has permission to access it.
+
+**Note:** An internet connection is required to download Python libraries and pull the Docker images from GitHub Container Registry (GHCR). The pipeline automatically checks for the latest Docker images before executing each component.
+
+
+## 2. Create a Virtual Environment
+
+Creating a Python virtual environment is recommended to isolate the workflow dependencies from other Python projects.
+
+### Linux and macOS
+
+From the repository directory, execute:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### Windows (PowerShell)
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+### Windows (Command Prompt)
+
+```cmd
+python -m venv venv
+venv\Scripts\activate.bat
+```
+
+Once activated, the terminal should display `(venv)` before the command prompt.
+
+## 3. Install the Required Python Libraries
+
+With the virtual environment activated, install the required libraries:
+
+```bash
+python -m pip install "prefect=3.6.20" docker pandas pyarrow
+```
+
+These libraries provide the functionality required by the orchestration script:
+
+| Library | Purpose |
+|---|---|
+| `prefect` | Workflow orchestration, monitoring, and artifact management |
+| `docker` | Programmatic execution of Docker containers |
+| `pandas` | Reading and processing Parquet outputs for Prefect artifacts |
+| `pyarrow` | Parquet file support for pandas |
+
+The remaining processing dependencies are packaged within their respective Docker images and do not need to be installed in the local Python environment.
+
+
+## 4. Start the Local Prefect Server
+
+Open a terminal in the repository directory and activate the virtual environment.
+
+Start the local Prefect server:
+
+```bash
+prefect server start
+```
+
+By default, the Prefect user interface is accessible at:
+
+http://127.0.0.1:4200
+
+Keep this terminal running throughout the experiments.
+
+## 5. Download the Dataset and Pipeline
+
+Click to download: 
+
+[Artificial Dataset](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Datasets/data.csv)
+
+[Diabetes Dataset](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Datasets/diabetes_data.csv)
+
+[Prefect workflow](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Workflows/artificial_data_pipeline.py)
+
+
+## 6. Configure the Dataset and Output Directories
+
+Before running the workflow, open `artificial_data_pipeline.py` using any text editor or IDE.
+
+Locate **lines 11 and 12**:
+
+```python
+DATASET_DIR = "/homelocal/path/to/Datasets/Artificial"
+HOST_SHARED_DIR = "/homelocal/path/to/Datasets/outputs"
+```
+Update these variables according to your local directory structure.
+
+- `DATASET_DIR`: Absolute path to the directory containing `data.csv`.
+- `HOST_SHARED_DIR`: Absolute path to the directory where intermediate datasets, synthetic datasets, and evaluation results will be stored.
+
+
+## 7. Execute the Workflow
+
+Open a **second terminal** in the repository directory.
+
+Activate the same virtual environment.
+
+### Linux and macOS
+
+```bash
+source venv/bin/activate
+```
+
+### Windows (PowerShell)
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+Configure the Prefect API endpoint:
+
+```bash
+prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
+```
+
+Then execute the pipeline:
+
+```bash
+python artificial_data_pipeline.py
+```
+
+The workflow executes the following stages:
+
+1. Data ingestion from `data.csv`.
+2. Removal of specified direct identifiers.
+3. Data cleaning.
+4. Training and testing dataset splitting.
+5. Synthetic data generation using Gaussian Copula, followed by statistical, utility, and privacy evaluation.
+6. Synthetic data generation using CTGAN, followed by the same evaluations.
+7. Synthetic data generation using CopulaGAN, followed by the same evaluations.
+
+The three experiments are executed sequentially.
+
+**Note:** The workflow automatically pulls the specified Docker images from GHCR before executing each component. The first execution may take longer because the required images must be downloaded.
+
+## 8. Monitor Workflow Execution
+
+Open the Prefect dashboard in a web browser:
+
+http://127.0.0.1:4200
+
+From the dashboard:
+
+1. Navigate to **Flow Runs**.
+2. Select the **Artificial Data Pipeline** flow run.
+3. Inspect the execution status of individual tasks.
+4. Review task logs to monitor progress or investigate failures.
+5. Open **Artifacts** to inspect previews of generated datasets and evaluation results.
+
+The dashboard provides a graphical overview of workflow execution and allows users to monitor the different processing stages.
+
+## 9. Workflow Outputs
+
+All generated files are stored in the directory specified by `HOST_SHARED_DIR`.
+
+### Data Preparation
+
+| Output | Description |
+|---|---|
+| `ingested_data.parquet` | Dataset after ingestion |
+| `de_identified_data.parquet` | Dataset after direct identifier removal |
+| `cleaned_data.parquet` | Dataset after missing-value cleaning |
+| `train_data.parquet` | Real training dataset |
+| `test_data.parquet` | Held-out real testing dataset |
+
+### Synthetic Data Generation
+
+| Output | Description |
+|---|---|
+| `synthetic_data_copula.parquet` | Synthetic dataset generated using Gaussian Copula |
+| `synthetic_data_ctgan.parquet` | Synthetic dataset generated using CTGAN |
+| `synthetic_data_copula_gan.parquet` | Synthetic dataset generated using CopulaGAN |
+
+### Evaluation Results
+
+Each synthetic dataset is evaluated using three complementary evaluation components.
+
+| Evaluation | Gaussian Copula | CTGAN | CopulaGAN |
+|---|---|---|---|
+| Statistical fidelity | `statistical_evaluation_results_copula.parquet` | `statistical_evaluation_results_ctgan.parquet` | `statistical_evaluation_results_copula_gan.parquet` |
+| Machine learning utility | `utility_evaluation_results_copula.parquet` | `utility_evaluation_results_ctgan.parquet` | `utility_evaluation_results_copula_gan.parquet` |
+| Privacy evaluation | `privacy_evaluation_results_copula.parquet` | `privacy_evaluation_results_ctgan.parquet` | `privacy_evaluation_results_copula_gan.parquet` |
+
+The evaluation components assess:
+
+- **Statistical fidelity:** Distribution and correlation similarity between real and synthetic datasets.
+- **Machine learning utility:** Predictive performance of models trained on real versus synthetic data and evaluated on held-out real data.
+- **Privacy:** Singling-out, linkability, and inference attacks, with estimated privacy risks and corresponding attack success rates.
+
+## 10. Troubleshooting
+
+**Docker daemon not accessible**
+
+Ensure that Docker is running and that the current user has permission to access the Docker daemon.
+
+**Input dataset not found**
+
+Verify that `DATASET_DIR` points to the directory containing `data.csv`, rather than to the CSV file itself.
+
+**Docker image download fails**
+
+Verify internet connectivity and access to the required images on GHCR.
+
+**Prefect dashboard does not display the workflow**
+
+Confirm that the Prefect server is running and that `PREFECT_API_URL` points to `http://127.0.0.1:4200/api`.
+
+**Permission denied when accessing output files**
+
+Ensure that Docker can read the input directory and write to the output directory.
+
+**Missing Python module**
+
+Confirm that the virtual environment is activated and repeat the installation command in Section 4.
 
 ---
 
-## Features
+## Reproducibility Notes
 
-- **Modular architecture:** Independent and reusable components for building customizable data pipelines.
-- **Task-level containerization:** Docker-based execution environments that promote portability, consistency, and reproducibility.
-- **Workflow orchestration:** Prefect-based execution, monitoring, and visualization of end-to-end data pipelines.
-- **Multiple generation methods:** Support for statistical, deep learning-based, and hybrid synthetic data generation techniques.
-- **Multidimensional evaluation:** Integrated assessment of statistical fidelity, predictive utility, and privacy-related disclosure risks.
-- **Extensibility:** A component-based design that facilitates the integration of additional privacy-preserving techniques, generation algorithms, and evaluation methods.
+The experiments use a common real training dataset and held-out real testing dataset to support comparisons across the three synthetic data generation approaches.
 
----
+Although the pipeline specifies a random seed for the train/test split, synthetic data generation methods may exhibit variability between executions, depending on their internal random initialization and computational environment.
 
-## Current Components
-
-The framework provides reusable components that can be executed independently or combined into complete end-to-end workflows.
-
-### 1. Data Preparation
-
-- **Data Ingestion:** Extraction of tabular data from supported file formats, databases, and REST APIs.
-- **Data Cleaning:** Identification and handling of missing values.
-- **De-identification:** Removal of specified direct identifiers.
-- **Train/Test Splitting:** Partitioning datasets into training and testing subsets, with optional stratification.
-
-### 2. Synthetic Data Generation
-
-The framework supports three complementary approaches to tabular synthetic data generation:
-
-- **Gaussian Copula:** A statistical model-based approach that captures marginal distributions and dependencies between variables.
-- **CTGAN:** A deep learning-based approach using conditional generative adversarial networks.
-- **CopulaGAN:** A hybrid approach combining statistical transformations with GAN-based synthetic data generation.
-
-### 3. Privacy Evaluation
-
-Privacy-related disclosure risks are assessed using the Anonymeter framework through three attack-based evaluations:
-
-- **Singling-out:** Assesses the possibility of isolating individual records.
-- **Linkability:** Evaluates whether records can be linked using auxiliary information.
-- **Inference:** Assesses the possibility of inferring sensitive attributes from available information.
-
-The evaluation reports estimated privacy risks alongside attack success rates and baseline/control results.
-
-### 4. Statistical Fidelity Evaluation
-
-Statistical fidelity is assessed through two complementary measures:
-
-- **Distribution Similarity:** Measures similarity between real and synthetic feature distributions using Jensen–Shannon distance.
-- **Correlation Similarity:** Evaluates preservation of pairwise relationships using Spearman correlation, Cramér's V, and correlation ratio, depending on feature types.
-
-Both measures are expressed as similarity scores, where values closer to 100% indicate greater statistical similarity.
-
-### 5. Machine Learning Utility Evaluation
-
-Evaluates the extent to which synthetic datasets preserve information relevant to downstream machine learning tasks.
-
-The component supports classification and regression models and compares two experimental settings:
-
-- **Train on Real, Test on Real (TRTR):** Establishes predictive performance using real training data and held-out real test data.
-- **Train on Synthetic, Test on Real (TSTR):** Evaluates predictive performance when synthetic data replace real training data.
-
-The evaluation reports predictive performance metrics and retained utility relative to the real-data baseline.
-
----
-
-## Citation
-
-If you use this framework or any of its components in your research, please cite the associated publication.
-
-Citation information will be added upon publication.
-
----
-
-## License
-
-This project is licensed under the Apache License 2.0.
-
-See the [LICENSE](LICENSE) file for details.
-
----
-
-## Acknowledgements
-
-This work has been developed within the context of the **INSAFEDARE** project, which aims to support high-assurance, data-driven decision-making in medical device regulation through privacy-preserving data technologies and associated evaluation methodologies.
+For exact reproduction of published results, record the versions or image digests of the Docker images used during the experiments.
