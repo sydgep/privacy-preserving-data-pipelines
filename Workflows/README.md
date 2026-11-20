@@ -1,16 +1,22 @@
 # Reproducibility Experiments
 
+This guide provides step-by-step instructions for reproducing the synthetic data generation and evaluation experiments using Docker and Prefect.
+
+The workflow executes three experiments sequentially, using **Gaussian Copula, CTGAN, and CopulaGAN** to generate synthetic datasets. Each generated dataset is subsequently evaluated in terms of statistical fidelity, machine learning utility, and privacy-related risks.
+
+All processing components are executed as independent Docker containers, while Prefect manages workflow orchestration, execution monitoring, and visualization.
 
 ## 1. Prerequisites
 
-Before executing a workflow, ensure that the following software is available:
+Before executing the pipeline, ensure that the following software is installed:
 
-* Python 3.10 or later;
-* Docker Engine or Docker Desktop;
+- **Python 3.10 or later** (Python 3.11 or 3.12 recommended).
+- **Docker Engine or Docker Desktop**.
+- **Git** (recommended for downloading the repository).
 
 The Docker daemon must be running because the workflow uses the Docker Python SDK to create and execute containers.
 
-Verify the installations with:
+Verify the installations:
 
 ```bash
 python --version
@@ -18,388 +24,241 @@ docker --version
 docker info
 ```
 
-The `docker info` command should complete successfully. An error indicating that the Docker daemon cannot be reached usually means Docker is not running or the current user does not have permission to access it.
+On some Linux and macOS systems, use `python3` instead of `python`.
 
----
+The `docker info` command should complete successfully. If it reports that the Docker daemon cannot be reached, ensure that Docker is running and that your user account has permission to access it.
 
-## 2. Download the dataset and the pipeline
+**Note:** An internet connection is required to download Python libraries and pull the Docker images from GitHub Container Registry (GHCR). The pipeline automatically checks for the latest Docker images before executing each component.
+
+## 2. Download the Dataset and Pipeline
+
+Clone the GitHub repository:
 
 ```bash
-git clone https://github.com/INSAFEDARE/privacy-preserving-framework.git
-cd privacy-preserving-framework/Workflows
+git clone https://github.com/<OWNER>/<REPOSITORY>.git
+cd <REPOSITORY>
 ```
 
+Replace `<OWNER>` and `<REPOSITORY>` with the actual GitHub repository details.
 
----
+Alternatively, download the repository as a ZIP file using **Code → Download ZIP** on GitHub, then extract it.
+
+The repository includes:
+
+- `artificial_data_pipeline.py` — the executable Prefect workflow.
+- `data.csv` — the input dataset used in the experiments.
+
+No additional dataset download is required.
 
 ## 3. Create a Virtual Environment
 
-A virtual environment isolates the Python packages required to run the workflows from the system-wide Python installation.
+Creating a Python virtual environment is recommended to isolate the workflow dependencies from other Python projects.
 
 ### Linux and macOS
 
-From the repository root or the `workflows` directory, run:
+From the repository directory, execute:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-Depending on the system configuration, `python` may be used instead of `python3`:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-### Windows PowerShell
+### Windows (PowerShell)
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 ```
 
-### Windows Command Prompt
+### Windows (Command Prompt)
 
 ```cmd
-python -m venv .venv
-.venv\Scripts\activate.bat
+python -m venv venv
+venv\Scripts\activate.bat
 ```
 
-After activation, the command prompt should normally include the environment name:
-
-```text
-(.venv)
-```
-
-Upgrade `pip` before installing the required libraries:
-
-```bash
-python -m pip install --upgrade pip
-```
-
-To leave the virtual environment later, run:
-
-```bash
-deactivate
-```
-
----
+Once activated, the terminal should display `(venv)` before the command prompt.
 
 ## 4. Install the Required Python Libraries
 
-This project does not use a `requirements.txt` file. Install the workflow dependencies directly:
+With the virtual environment activated, install the required libraries:
 
 ```bash
-python -m pip install "prefect==3.6.20" docker pandas
+python -m pip install "prefect=3.6.20" docker pandas pyarrow
 ```
 
-The workflow files contain the following imports:
+These libraries provide the functionality required by the orchestration script:
 
-```python
-import os
-import json
-import docker
-import pandas as pd
+| Library | Purpose |
+|---|---|
+| `prefect` | Workflow orchestration, monitoring, and artifact management |
+| `docker` | Programmatic execution of Docker containers |
+| `pandas` | Reading and processing Parquet outputs for Prefect artifacts |
+| `pyarrow` | Parquet file support for pandas |
 
-from prefect import task, flow, get_run_logger
-from prefect.artifacts import create_table_artifact
-```
-
-The `os` and `json` modules are included in the Python standard library and do not require separate installation.
-
-The externally installed packages are:
-
-| Package           | Purpose                                                                          |
-| ----------------- | -------------------------------------------------------------------------------- |
-| `prefect==3.6.20` | Workflow orchestration, task execution, logging, state management, and artifacts |
-| `docker`          | Communication with the local Docker daemon and execution of component containers |
-| `pandas`          | Local data handling and preparation of tabular artifact content                  |
-
-Verify the installations:
-
-```bash
-python -c "import prefect; print('Prefect:', prefect.__version__)"
-python -c "import docker; print('Docker SDK:', docker.__version__)"
-python -c "import pandas; print('Pandas:', pandas.__version__)"
-```
-
----
+The remaining processing dependencies are packaged within their respective Docker images and do not need to be installed in the local Python environment.
 
 ## 5. Configure the Dataset and Output Directories
 
-Before running a workflow, open the selected Python file and update its directory configuration.
+Before running the workflow, open `artificial_data_pipeline.py` using any text editor or IDE.
 
-A workflow typically contains variables similar to:
-
-```python
-DATASET_DIR = "/path/to/Datasets"
-HOST_SHARED_DIR = "/path/to/Datasets/outputs/brca_anonym"
-```
-
-These paths are host-machine directories. They are mounted into the Docker containers when individual pipeline components execute.
-
-### `DATASET_DIR`
-
-`DATASET_DIR` identifies the directory containing the input dataset.
-
-For example:
+Locate **lines 11 and 12**:
 
 ```python
-DATASET_DIR = "/home/user/privacy-framework/datasets"
+DATASET_DIR = "/homelocal/path/to/Datasets/Artificial"
+HOST_SHARED_DIR = "/homelocal/path/to/Datasets/outputs"
 ```
+Update these variables according to your local directory structure.
 
-The corresponding input file might be:
+- `DATASET_DIR`: Absolute path to the directory containing `data.csv`.
+- `HOST_SHARED_DIR`: Absolute path to the directory where intermediate datasets, synthetic datasets, and evaluation results will be stored.
 
-```text
-/home/user/privacy-framework/datasets/BRCA.csv
-```
+## 6. Start the Local Prefect Server
 
-### `HOST_SHARED_DIR`
+Open a terminal in the repository directory and activate the virtual environment.
 
-`HOST_SHARED_DIR` identifies the directory where the workflow stores the intermediate outputs;
-
-
-For example:
-
-```python
-HOST_SHARED_DIR = "/home/user/privacy-framework/outputs/brca_anonym"
-```
-
-Use a separate output directory for every workflow to prevent files from different experiments from overwriting one another.
-
----
-
-## 6. Verify Docker Access from Python
-
-The workflow communicates with Docker through the Docker Python SDK.
-
-Before starting Prefect, test this connection:
+Start the local Prefect server:
 
 ```bash
-python -c "import docker; client = docker.from_env(); print(client.ping())"
-```
-
-A successful connection should print:
-
-```text
-True
-```
-
-You may also list the locally available images:
-
-```bash
-python -c "import docker; client = docker.from_env(); print([image.tags for image in client.images.list()])"
-```
-
-The workflow code already specifies the Docker image associated with each component. No image-building step is required to execute these workflows.
-
-When an image is stored in a private container registry, authenticate with that registry before running the workflow.
-
----
-
-## 7. Start the Local Prefect Server
-
-Open a terminal, activate the virtual environment, and start the Prefect server:
-
-```bash
-source .venv/bin/activate
 prefect server start
 ```
 
-On Windows PowerShell:
+By default, the Prefect user interface is accessible at:
 
-```powershell
-.venv\Scripts\Activate.ps1
-prefect server start
-```
-
-Keep this terminal open while the workflows are running.
-
-By default, the Prefect user interface is available at:
-
-```text
 http://127.0.0.1:4200
-```
 
-The API endpoint used by the workflow client is:
+Keep this terminal running throughout the experiments.
 
-```text
-http://127.0.0.1:4200/api
-```
+## 7. Execute the Workflow
 
-Stop the server when required by pressing:
+Open a **second terminal** in the repository directory.
 
-```text
-Ctrl+C
-```
-
----
-
-## 11. Configure the Prefect API URL
-
-Open a second terminal and activate the same virtual environment.
+Activate the same virtual environment.
 
 ### Linux and macOS
 
 ```bash
-source .venv/bin/activate
+source venv/bin/activate
 ```
 
-### Windows PowerShell
+### Windows (PowerShell)
 
 ```powershell
-.venv\Scripts\Activate.ps1
+.\venv\Scripts\Activate.ps1
 ```
 
-Configure Prefect to use the local server:
+Configure the Prefect API endpoint:
 
 ```bash
 prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
 ```
 
-Verify the configuration:
+Then execute the pipeline:
 
 ```bash
-prefect config view
+python artificial_data_pipeline.py
 ```
 
-The output should contain:
+The workflow executes the following stages:
 
-```text
-PREFECT_API_URL='http://127.0.0.1:4200/api'
-```
+1. Data ingestion from `data.csv`.
+2. Removal of specified direct identifiers.
+3. Data cleaning.
+4. Training and testing dataset splitting.
+5. Synthetic data generation using Gaussian Copula, followed by statistical, utility, and privacy evaluation.
+6. Synthetic data generation using CTGAN, followed by the same evaluations.
+7. Synthetic data generation using CopulaGAN, followed by the same evaluations.
 
-You can also inspect only the API URL:
+The three experiments are executed sequentially.
 
-```bash
-prefect config view --show-sources
-```
+**Note:** The workflow automatically pulls the specified Docker images from GHCR before executing each component. The first execution may take longer because the required images must be downloaded.
 
-This configuration is generally stored in the active Prefect profile and does not need to be repeated for every pipeline execution.
+## 8. Monitor Workflow Execution
 
----
+Open the Prefect dashboard in a web browser:
 
-## 8. Test the Prefect Connection
-
-Confirm that the server is running by opening:
-
-```text
 http://127.0.0.1:4200
-```
 
-in a web browser.
+From the dashboard:
 
-You can also verify the configured API URL from Python:
+1. Navigate to **Flow Runs**.
+2. Select the **Artificial Data Pipeline** flow run.
+3. Inspect the execution status of individual tasks.
+4. Review task logs to monitor progress or investigate failures.
+5. Open **Artifacts** to inspect previews of generated datasets and evaluation results.
 
-```bash
-python -c "from prefect.settings import get_current_settings; print(get_current_settings().api.url)"
-```
+The dashboard provides a graphical overview of workflow execution and allows users to monitor the different processing stages.
 
-The result should point to:
+## 9. Workflow Outputs
 
-```text
-http://127.0.0.1:4200/api
-```
+All generated files are stored in the directory specified by `HOST_SHARED_DIR`.
 
----
+### Data Preparation
 
-## 9. Execute a Workflow
+| Output | Description |
+|---|---|
+| `ingested_data.parquet` | Dataset after ingestion |
+| `de_identified_data.parquet` | Dataset after direct identifier removal |
+| `cleaned_data.parquet` | Dataset after missing-value cleaning |
+| `train_data.parquet` | Real training dataset |
+| `test_data.parquet` | Held-out real testing dataset |
 
-The six workflows may be executed sequentially:
+### Synthetic Data Generation
 
-```bash
-python artificial_anonymization_pipeline.py
-python artificial_synthesization_pipeline.py
-python brca_anonymization_pipeline.py
-python brca_synthesization_pipeline.py
-python mimic_anonymization_pipeline.py
-python mimic_synthesization_pipeline.py
-```
+| Output | Description |
+|---|---|
+| `synthetic_data_copula.parquet` | Synthetic dataset generated using Gaussian Copula |
+| `synthetic_data_ctgan.parquet` | Synthetic dataset generated using CTGAN |
+| `synthetic_data_copula_gan.parquet` | Synthetic dataset generated using CopulaGAN |
 
-Before executing all workflows, confirm that:
+### Evaluation Results
 
-* every workflow has a distinct `HOST_SHARED_DIR`;
-* the required datasets are available;
-* MIMIC-IV access requirements have been satisfied;
-* sufficient disk space is available; and
-* the Prefect server remains active.
+Each synthetic dataset is evaluated using three complementary evaluation components.
 
-Sequential execution is recommended for the first complete reproduction because it simplifies log inspection and resource management.
+| Evaluation | Gaussian Copula | CTGAN | CopulaGAN |
+|---|---|---|---|
+| Statistical fidelity | `statistical_evaluation_results_copula.parquet` | `statistical_evaluation_results_ctgan.parquet` | `statistical_evaluation_results_copula_gan.parquet` |
+| Machine learning utility | `utility_evaluation_results_copula.parquet` | `utility_evaluation_results_ctgan.parquet` | `utility_evaluation_results_copula_gan.parquet` |
+| Privacy evaluation | `privacy_evaluation_results_copula.parquet` | `privacy_evaluation_results_ctgan.parquet` | `privacy_evaluation_results_copula_gan.parquet` |
 
----
+The evaluation components assess:
 
-## 10. Monitor Workflow Execution
+- **Statistical fidelity:** Distribution and correlation similarity between real and synthetic datasets.
+- **Machine learning utility:** Predictive performance of models trained on real versus synthetic data and evaluated on held-out real data.
+- **Privacy:** Singling-out, linkability, and inference attacks, with estimated privacy risks and corresponding attack success rates.
 
-After starting a workflow, monitor it in two places.
+## 10. Troubleshooting
 
-### Terminal
+**Docker daemon not accessible**
 
-The terminal displays:
+Ensure that Docker is running and that the current user has permission to access the Docker daemon.
 
-* flow-run creation;
-* task-run status;
-* Docker container execution;
-* component logs;
-* output-file locations;
-* warnings;
-* retries; and
-* exceptions.
+**Input dataset not found**
 
-### Prefect User Interface
+Verify that `DATASET_DIR` points to the directory containing `data.csv`, rather than to the CSV file itself.
 
-Open:
+**Docker image download fails**
 
-```text
-http://127.0.0.1:4200
-```
+Verify internet connectivity and access to the required images on GHCR.
 
-The Prefect interface provides:
+**Prefect dashboard does not display the workflow**
 
-* flow-run status;
-* task dependencies;
-* task execution duration;
-* execution logs;
-* failed-task information;
-* retries;
-* generated artifacts; and
-* historical workflow runs.
+Confirm that the Prefect server is running and that `PREFECT_API_URL` points to `http://127.0.0.1:4200/api`.
 
-A successful workflow should finish with a `Completed` state.
+**Permission denied when accessing output files**
+
+Ensure that Docker can read the input directory and write to the output directory.
+
+**Missing Python module**
+
+Confirm that the virtual environment is activated and repeat the installation command in Section 4.
 
 ---
 
-## 11. Workflow Outputs
+## Reproducibility Notes
 
-Workflow results are written to the configured `HOST_SHARED_DIR`.
+The experiments use a common real training dataset and held-out real testing dataset to support comparisons across the three synthetic data generation approaches.
 
-For example:
+Although the pipeline specifies a random seed for the train/test split, synthetic data generation methods may exhibit variability between executions, depending on their internal random initialization and computational environment.
 
-```python
-HOST_SHARED_DIR = "/home/user/privacy-preserving-framework/outputs/brca_anonymization"
-```
-
-Prefect table artifacts may also be displayed in the Prefect user interface. These artifacts summarize selected execution outputs, but the files stored under `HOST_SHARED_DIR` remain the primary pipeline outputs.
-
----
-
-## 12. Data Privacy Considerations
-
-The workflows run Docker containers on the local machine and access datasets through configured host-directory mounts.
-
-Users remain responsible for:
-
-* obtaining permission to access restricted datasets;
-* complying with applicable data-use agreements;
-* limiting access to the Prefect interface;
-* protecting host input and output directories;
-* avoiding the inclusion of sensitive record-level information in logs or artifacts; and
-* securely deleting intermediate outputs when they are no longer required.
-
-Do not upload restricted datasets, MIMIC-IV-derived datasets, sensitive workflow outputs, or credentials to the public repository.
-
-The local Prefect interface should not be exposed to an untrusted network without appropriate authentication and access controls.
-
----
-
-
+For exact reproduction of published results, record the versions or image digests of the Docker images used during the experiments.
