@@ -1,20 +1,5 @@
-# Workflows
+# Reproducibility Experiments
 
-This directory contains the six Prefect workflows used to execute and evaluate the privacy-preserving healthcare data pipelines described in the accompanying research work.
-
-The workflows cover two privacy-preserving approaches—anonymization and synthetic data generation—applied to three datasets. Each workflow orchestrates independently executable Docker components. The Docker image references and component parameters are already defined within the corresponding Python workflow files.
-
-This guide explains how to:
-
-* prepare the local Python environment;
-* install the required Python libraries;
-* configure input and output directories;
-* start the local Prefect server;
-* connect the workflows to the Prefect API;
-* execute and monitor a pipeline; and
-* troubleshoot common execution problems.
-
----
 
 ## 1. Prerequisites
 
@@ -22,8 +7,6 @@ Before executing a workflow, ensure that the following software is available:
 
 * Python 3.10 or later;
 * Docker Engine or Docker Desktop;
-* Git, when the repository is cloned from GitHub;
-* sufficient disk space for input datasets, intermediate files, outputs, and Docker images.
 
 The Docker daemon must be running because the workflow uses the Docker Python SDK to create and execute containers.
 
@@ -39,9 +22,7 @@ The `docker info` command should complete successfully. An error indicating that
 
 ---
 
-## 2. Clone the Repository
-
-Clone the repository and enter the workflow directory:
+## 2. Download the dataset and the pipeline
 
 ```bash
 git clone https://github.com/INSAFEDARE/privacy-preserving-framework.git
