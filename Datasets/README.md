@@ -4,9 +4,9 @@ This directory contains the datasets used to demonstrate and evaluate the Privac
 
 The framework has been evaluated using three healthcare datasets of increasing complexity:
 
-1. **Artificial Healthcare Dataset** (`raw_data.csv`)
-2. **Breast Cancer Dataset** (`BRCA.csv`)
-3. **MIMIC-IV (Not Distributed)**
+1. **Artificial Healthcare Dataset** (`data.csv`)
+2. **Diabetes Dataset** (`diabetes.csv`)
+3. **MIMIC-IV Dataset (Not Distributed)**
 
 The first two datasets are included in this repository for testing and demonstration purposes. The MIMIC-IV dataset is **not included** because it is distributed under a Data Use Agreement (DUA).
 
@@ -17,7 +17,7 @@ The first two datasets are included in this repository for testing and demonstra
 **File**
 
 ```text
-raw_data.csv
+data.csv
 ```
 
 ### Description
@@ -30,7 +30,6 @@ Typical use cases include:
 
 * testing Docker components
 * validating workflow execution
-* evaluating anonymization methods
 * evaluating synthetic data generators
 * reproducing the experiments presented in the paper
 
@@ -41,7 +40,7 @@ Typical use cases include:
 **File**
 
 ```text
-BRCA.csv
+diabetes.csv
 ```
 
 ### Source
