@@ -113,15 +113,4 @@ This integrated dataset serves as an example input for evaluating privacy-preser
 
 ---
 
-# Reproducibility
-
-The framework is independent of any specific dataset.
-
-Researchers may reproduce the experiments using:
-
-* the datasets provided in this directory;
-* an authorised copy of MIMIC-IV; or
-* any structured healthcare dataset containing direct identifiers, quasi-identifiers, and sensitive attributes.
-
-Please refer to the documentation of the individual workflow examples for execution instructions.
 
