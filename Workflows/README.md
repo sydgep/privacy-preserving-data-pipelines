@@ -29,17 +29,8 @@ The `docker info` command should complete successfully. If it reports that the D
 
 **Note:** An internet connection is required to download Python libraries and pull the Docker images from GitHub Container Registry (GHCR). The pipeline automatically checks for the latest Docker images before executing each component.
 
-## 2. Download the Dataset and Pipeline
 
-Click to download: 
-
-[Artificial Dataset](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Datasets/data.csv)
-
-[Diabetes Dataset](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Datasets/diabetes_data.csv)
-
-[Prefect workflow](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Workflows/artificial_data_pipeline.py)
-
-## 3. Create a Virtual Environment
+## 2. Create a Virtual Environment
 
 Creating a Python virtual environment is recommended to isolate the workflow dependencies from other Python projects.
 
@@ -68,7 +59,7 @@ venv\Scripts\activate.bat
 
 Once activated, the terminal should display `(venv)` before the command prompt.
 
-## 4. Install the Required Python Libraries
+## 3. Install the Required Python Libraries
 
 With the virtual environment activated, install the required libraries:
 
@@ -87,22 +78,8 @@ These libraries provide the functionality required by the orchestration script:
 
 The remaining processing dependencies are packaged within their respective Docker images and do not need to be installed in the local Python environment.
 
-## 5. Configure the Dataset and Output Directories
 
-Before running the workflow, open `artificial_data_pipeline.py` using any text editor or IDE.
-
-Locate **lines 11 and 12**:
-
-```python
-DATASET_DIR = "/homelocal/path/to/Datasets/Artificial"
-HOST_SHARED_DIR = "/homelocal/path/to/Datasets/outputs"
-```
-Update these variables according to your local directory structure.
-
-- `DATASET_DIR`: Absolute path to the directory containing `data.csv`.
-- `HOST_SHARED_DIR`: Absolute path to the directory where intermediate datasets, synthetic datasets, and evaluation results will be stored.
-
-## 6. Start the Local Prefect Server
+## 4. Start the Local Prefect Server
 
 Open a terminal in the repository directory and activate the virtual environment.
 
@@ -117,6 +94,33 @@ By default, the Prefect user interface is accessible at:
 http://127.0.0.1:4200
 
 Keep this terminal running throughout the experiments.
+
+## 5. Download the Dataset and Pipeline
+
+Click to download: 
+
+[Artificial Dataset](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Datasets/data.csv)
+
+[Diabetes Dataset](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Datasets/diabetes_data.csv)
+
+[Prefect workflow](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Workflows/artificial_data_pipeline.py)
+
+
+## 6. Configure the Dataset and Output Directories
+
+Before running the workflow, open `artificial_data_pipeline.py` using any text editor or IDE.
+
+Locate **lines 11 and 12**:
+
+```python
+DATASET_DIR = "/homelocal/path/to/Datasets/Artificial"
+HOST_SHARED_DIR = "/homelocal/path/to/Datasets/outputs"
+```
+Update these variables according to your local directory structure.
+
+- `DATASET_DIR`: Absolute path to the directory containing `data.csv`.
+- `HOST_SHARED_DIR`: Absolute path to the directory where intermediate datasets, synthetic datasets, and evaluation results will be stored.
+
 
 ## 7. Execute the Workflow
 
