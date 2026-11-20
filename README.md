@@ -1,4 +1,4 @@
-# Reproducible Synthetic Data Generation and Evaluation Pipelines
+# Synthetic Data Generation and Evaluation Pipelines - Reproducibility Experiments
 
 This guide provides step-by-step instructions for reproducing the synthetic data generation and evaluation experiments using Docker and Prefect.
 
