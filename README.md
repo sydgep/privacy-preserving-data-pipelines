@@ -97,11 +97,9 @@ Keep this terminal running throughout the experiments.
 
 ## 5. Download the Dataset and Pipeline
 
-Click to download: 
+Either clone this repository or download the files here: 
 
 [Artificial Dataset](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Datasets/data.csv)
-
-[Diabetes Dataset](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Datasets/diabetes_data.csv)
 
 [Prefect workflow](https://github.com/sydgep/privacy-preserving-data-pipelines/blob/main/Workflows/artificial_data_pipeline.py)
 
