@@ -23,7 +23,7 @@ git clone https://github.com/sydgep/privacy-preserving-data-pipelines.git
 cd privacy-preserving-data-pipelines
 ```
 
-For a private repository, your GitHub account must have access. Alternatively, download the repository ZIP and extract it. Confirm that `Datasets/data.csv` and `Workflows/artificial_data_pipeline.py` are present.
+Confirm that `Datasets/data.csv` and `Workflows/artificial_data_pipeline.py` are present.
 
 ## 3. Create a virtual environment
 
@@ -55,7 +55,7 @@ python -m pip install --upgrade pip
 python -m pip install "prefect==3.6.20" docker pandas pyarrow
 ```
 
-`prefect` handles orchestration and artifacts; `docker` provides the Python Docker SDK; `pandas` and `pyarrow` support Parquet artifact previews. Other processing libraries are provided by the respective Docker images. If this Prefect version is unavailable for your Python installation, use a compatible Python 3.11/3.12 environment rather than silently changing the documented experiment environment.
+`prefect` handles orchestration and artifacts; `docker` provides the Python Docker SDK; `pandas` and `pyarrow` support Parquet artifact previews. Other processing libraries are provided by the respective Docker images. If this Prefect version is unavailable for your Python installation, use a compatible Python 3.11/3.12 environment.
 
 ## 5. Configure the dataset and output directories
 
@@ -90,17 +90,13 @@ prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
 python Workflows/artificial_data_pipeline.py
 ```
 
-The pipeline executes, in order: file ingestion → direct-identifier removal → missing-value cleaning → stratified train/test split → Gaussian Copula and its three evaluations → CTGAN and its three evaluations → CopulaGAN and its three evaluations.
-
-The first run may be slower while images are downloaded. **Image update behavior depends on the committed `run_container()` implementation:** if it calls `docker_client.images.pull(image)` before execution, it checks GHCR on every task; otherwise a locally cached image may be reused. Inspect the committed file before relying on automatic updates.
-
 ## 8. Monitor execution
 
 Open <http://127.0.0.1:4200>, select **Flow Runs**, and open **Artificial Data Pipeline**. Inspect task states and logs; use **Artifacts** for previews of Parquet outputs and evaluation tables.
 
 ## 9. Check the outputs
 
-Successful execution creates intermediate datasets, three synthetic datasets (`synthetic_data_copula.parquet`, `synthetic_data_ctgan.parquet`, and `synthetic_data_copula_gan.parquet`), and statistical, utility, and privacy evaluation results for each generator in `HOST_SHARED_DIR`. The Prefect **Artifacts** page also provides previews. Check the output directory and task logs if an expected result is missing.
+Successful execution creates intermediate datasets, three synthetic datasets (`synthetic_data_copula.parquet`, `synthetic_data_ctgan.parquet`, and `synthetic_data_copula_gan.parquet`), and statistical, utility, and privacy evaluation results for each generator in `HOST_SHARED_DIR`. The Prefect **Artifacts** page also provides previews. 
 
 ## 10. Troubleshooting
 
@@ -114,6 +110,3 @@ Successful execution creates intermediate datasets, three synthetic datasets (`s
 | Missing Python package | Activate the environment and repeat the installation command |
 | Script not found | Run `python Workflows/artificial_data_pipeline.py` from repository root |
 
-## Reproducibility considerations
-
-The split uses a configured seed, but the synthetic generators may still be stochastic. For paper-level reproducibility, record container image **digests**, the dataset revision, pipeline commit, and package versions. Pulling mutable `:latest` tags is useful during development but cannot guarantee identical future runs.
