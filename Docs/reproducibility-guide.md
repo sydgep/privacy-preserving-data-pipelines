@@ -1,12 +1,17 @@
 # Reproducibility Guide
 
-[← Main README](../README.md) · [Components](components-guide.md) · [Orchestration](workflow-orchestration.md)
+[← Main README](../README.md) · [Components Guide](components-guide.md)
 
-This guide reproduces the sequential **Gaussian Copula**, **CTGAN**, and **CopulaGAN** experiments on the supplied artificial dataset. Each generator is followed by statistical fidelity, machine learning utility, and privacy evaluation.
+This guide provides step-by-step instructions for reproducing the **Gaussian Copula**, **CTGAN**, and **CopulaGAN** experiments using Docker and Prefect. Each experiment includes **statistical fidelity**, **machine learning utility**, and **privacy risk evaluations**.
 
 ## 1. Prerequisites
 
-Install **Python 3.11 or 3.12** (recommended), **Docker Engine or Docker Desktop**, and **Git** (optional if downloading ZIP). Docker must be running and accessible to the account executing Python.
+Ensure the following tools are installed:
+
+- **Python 3.11 or 3.12** (recommended).
+- **Docker Engine or Docker Desktop**, installed and running.
+
+Verify your installation:
 
 ```bash
 python --version
@@ -14,18 +19,13 @@ docker --version
 docker info
 ```
 
-Use `python3` in place of `python` if required. `docker info` must succeed. Internet access is required for Python packages and GHCR container images.
+Use `python3` instead of `python` if required by your system. The `docker info` command must execute successfully.
 
-## 2. Download the repository
+An internet connection is required to install Python dependencies and download Docker images from GitHub Container Registry (GHCR).
 
-```bash
-git clone https://github.com/sydgep/privacy-preserving-data-pipelines.git
-cd privacy-preserving-data-pipelines
-```
+## 2. Create a Virtual Environment
 
-Confirm that `Datasets/data.csv` and `Workflows/artificial_data_pipeline.py` are present.
-
-## 3. Create a virtual environment
+Create and activate a Python virtual environment.
 
 **Linux/macOS:**
 
@@ -48,65 +48,144 @@ python -m venv venv
 venv\Scripts\activate.bat
 ```
 
-## 4. Install Python dependencies
+## 3. Install Python Dependencies
+
+Install the required Python libraries:
 
 ```bash
 python -m pip install --upgrade pip
 python -m pip install "prefect==3.6.20" docker pandas pyarrow
 ```
 
-`prefect` handles orchestration and artifacts; `docker` provides the Python Docker SDK; `pandas` and `pyarrow` support Parquet artifact previews. Other processing libraries are provided by the respective Docker images. If this Prefect version is unavailable for your Python installation, use a compatible Python 3.11/3.12 environment.
+Prefect manages workflow orchestration, while the Docker Python SDK enables container execution. Pandas and PyArrow support reading and displaying Parquet outputs.
 
-## 5. Configure the dataset and output directories
+Other processing dependencies are packaged within the respective Docker images.
 
-Open `Workflows/artificial_data_pipeline.py` and locate `DATASET_DIR` and `HOST_SHARED_DIR` near the beginning:
+## 4. Start the Prefect Server
 
-```python
-DATASET_DIR = "/absolute/path/to/privacy-preserving-data-pipelines/Datasets"
-HOST_SHARED_DIR = "/absolute/path/to/privacy-preserving-data-pipelines/outputs"
-```
-
-- `DATASET_DIR` is the **directory** containing `data.csv`, not the CSV file itself.
-- `HOST_SHARED_DIR` is the destination for intermediate data, synthetic datasets, and evaluation results. The script creates this directory if necessary.
-- Use **absolute host paths** and ensure Docker has access to both locations. The input mount is read-only; the output mount is read/write.
-- On Windows, use raw Python strings for paths, for example `r"C:\Users\username\privacy-preserving-data-pipelines\Datasets"`, and run Docker Desktop in Linux-container mode.
-
-## 6. Start Prefect (terminal 1)
-
-Activate the environment and run:
+In the current terminal, start the local Prefect server:
 
 ```bash
 prefect server start
 ```
 
-Leave this terminal open. The dashboard is usually available at <http://127.0.0.1:4200>.
+Keep this terminal running throughout the experiment.
 
-## 7. Run the workflow (terminal 2)
+The Prefect dashboard is available at:
 
-Open another terminal in the **repository root** and activate the same virtual environment. Point the Prefect client at the local server:
+http://127.0.0.1:4200
+
+## 5. Download the Dataset and Workflow
+
+Download the following two files from the repository:
+
+1. **[Artificial Dataset — data.csv](../Datasets/data.csv)**  
+   Input dataset used for the experiments.
+
+2. **[Prefect Workflow — artificial_data_pipeline.py](../Workflows/artificial_data_pipeline.py)**  
+   Python script defining the complete generation and evaluation pipeline.
+
+Save both files in a convenient location on your computer.
+
+**Alternative: Clone the repository**
+
+If you prefer to obtain the complete repository, run:
+
+```bash
+git clone https://github.com/sydgep/privacy-preserving-data-pipelines.git
+cd privacy-preserving-data-pipelines
+```
+
+The dataset and workflow are available in the `Datasets/` and `Workflows/` directories, respectively.
+
+## 6. Configure Dataset and Output Directories
+
+Open `artificial_data_pipeline.py` and locate the following variables near the beginning of the script:
+
+```python
+DATASET_DIR = "/absolute/path/to/Experiments/Datasets"
+HOST_SHARED_DIR = "/absolute/path/to/Experiments/outputs"
+```
+
+Replace these example paths with the actual absolute paths on your computer.
+
+- **`DATASET_DIR`** specifies the directory containing `data.csv`, not the CSV file itself.
+- **`HOST_SHARED_DIR`** specifies where intermediate datasets, generated synthetic data, and evaluation results will be stored. The workflow creates this directory if necessary.
+- Both paths must be accessible to Docker. The input directory is mounted as read-only, while the output directory is mounted with read/write access.
+
+**Windows users:** Use raw Python strings for Windows paths, for example:
+
+```python
+DATASET_DIR = r"C:\Users\username\Experiments\Datasets"
+HOST_SHARED_DIR = r"C:\Users\username\Experiments\outputs"
+```
+
+Ensure Docker Desktop is configured to use Linux containers.
+
+## 7. Execute the Workflow
+
+Open a second terminal and activate the same Python virtual environment.
+
+Configure the Prefect API connection:
 
 ```bash
 prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
+```
+
+Navigate to the directory containing the downloaded workflow and execute:
+
+```bash
+python artificial_data_pipeline.py
+```
+
+If you cloned the repository and are executing from its root directory, use:
+
+```bash
 python Workflows/artificial_data_pipeline.py
 ```
 
-## 8. Monitor execution
+The workflow executes the data preparation, synthetic data generation, and evaluation tasks sequentially.
 
-Open <http://127.0.0.1:4200>, select **Flow Runs**, and open **Artificial Data Pipeline**. Inspect task states and logs; use **Artifacts** for previews of Parquet outputs and evaluation tables.
+Docker containers are used to execute the individual processing components, while Prefect manages their orchestration and monitoring.
 
-## 9. Check the outputs
+## 8. Monitor Execution and Verify Results
 
-Successful execution creates intermediate datasets, three synthetic datasets (`synthetic_data_copula.parquet`, `synthetic_data_ctgan.parquet`, and `synthetic_data_copula_gan.parquet`), and statistical, utility, and privacy evaluation results for each generator in `HOST_SHARED_DIR`. The Prefect **Artifacts** page also provides previews. 
+Open the Prefect dashboard at http://127.0.0.1:4200.
 
-## 10. Troubleshooting
+Under **Flow Runs**, select the **Artificial Data Pipeline** run to inspect task execution states and logs.
 
-| Problem | Check |
+The **Artifacts** section provides previews of intermediate datasets and evaluation results.
+
+After successful execution, the configured `HOST_SHARED_DIR` contains:
+
+- Preprocessed training and test datasets.
+- Three synthetic datasets generated using Gaussian Copula, CTGAN, and CopulaGAN.
+- Statistical fidelity, machine learning utility, and privacy evaluation results for each generator.
+
+The synthetic datasets are saved as:
+
+```text
+synthetic_data_copula.parquet
+synthetic_data_ctgan.parquet
+synthetic_data_copula_gan.parquet
+```
+
+Evaluation results are also saved in Parquet format.
+
+## 9. Troubleshooting
+
+| Problem | Suggested solution |
 |---|---|
-| Docker daemon unavailable | Start Docker; check `docker info` and user permissions |
-| Input file not found | Ensure `DATASET_DIR` points to the folder containing `data.csv` |
-| Image pull fails | Check network connectivity and GHCR image access |
-| Prefect dashboard empty | Verify server is running and `PREFECT_API_URL` points to `/api` |
-| Cannot write output | Check output directory permissions and Docker file-sharing settings |
-| Missing Python package | Activate the environment and repeat the installation command |
-| Script not found | Run `python Workflows/artificial_data_pipeline.py` from repository root |
+| Docker daemon unavailable | Ensure Docker is running and verify access using `docker info`. |
+| Input dataset not found | Confirm that `DATASET_DIR` points to the directory containing `data.csv`. |
+| Docker image download fails | Check internet connectivity and access to GitHub Container Registry. |
+| Prefect dashboard is empty | Confirm that the server is running and `PREFECT_API_URL` points to `http://127.0.0.1:4200/api`. |
+| Cannot write output files | Verify directory permissions and Docker file-sharing settings. |
+| Missing Python dependency | Activate the virtual environment and repeat the dependency installation command. |
+| Workflow script not found | Verify the current working directory and the path to `artificial_data_pipeline.py`. |
 
+## 10. Reproducibility Notes
+
+The experiments use a common training and test split to support comparisons across the three synthetic data generators.
+
+For details about the individual components, their configuration parameters, and standalone execution, consult the [Components Guide](components-guide.md).
