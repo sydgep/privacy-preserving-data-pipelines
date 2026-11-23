@@ -1,6 +1,6 @@
 # Reusable Components Guide
 
-[← Main README](../README.md) · [Reproducibility](reproducibility-guide.md) · [Orchestration](workflow-orchestration.md)
+[← Main README](../README.md) · [Reproducibility](reproducibility-guide.md) ·
 
 Each component is distributed as a Docker image and configured through environment variables. You can run a component on its own; no Prefect installation is needed for the Docker commands below.
 
