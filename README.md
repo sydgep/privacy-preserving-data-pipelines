@@ -8,24 +8,23 @@ The reference workflow compares **Gaussian Copula**, **CTGAN**, and **CopulaGAN*
 
 | Guide | What you will find |
 |---|---|
-| **[Reproducibility Guide](Docs/reproducibility-guide.md)** | Set up your environment and reproduce the reference experiments |
-| **[Components Guide](Docs/components-guide.md)** | Understand each Docker component, its parameters, and how to run it independently |
-| **[Workflow Orchestration Guide](Docs/workflow-orchestration.md)** | Connect components and build custom pipelines, with or without Prefect |
+| **[Reproducibility Guide](Docs/reproducibility-guide.md)** | Set up the environment and reproduce the reference experiments. |
+| **[Components Guide](Docs/components-guide.md)** | Explore the available Docker components, their functionalities, configuration parameters, and standalone execution instructions. |
 
-**Co-authors reproducing the experiments:** Start with the [Reproducibility Guide](Docs/reproducibility-guide.md).
+**To reproduce the experiments:** Start with the [Reproducibility Guide](Docs/reproducibility-guide.md).
 
-## Repository resources
+## Repository Resources
 
-- [Reference Prefect workflow](Workflows/artificial_data_pipeline.py)
-- [Input dataset](Datasets/data.csv)
+- [Reference Prefect Workflow](Workflows/artificial_data_pipeline.py)
+- [Input Dataset](Datasets/data.csv)
 
 ## Citation
 
-For citation information, see [CITATION.cff](CITATION.cff). Details of the associated publication will be updated when available.
+If you use this software in your research, please refer to [CITATION.cff](CITATION.cff) for citation information. Details of the associated publication will be added when available.
 
 ## License
 
-See [LICENSE](LICENSE). Third-party dependencies and container images may have their own license terms.
+This repository is distributed under the [Apache License 2.0](LICENSE). Third-party dependencies and Docker images may be subject to separate license terms.
 
 ## Acknowledgements
 
