@@ -11,8 +11,6 @@ The reference workflow compares **Gaussian Copula**, **CTGAN**, and **CopulaGAN*
 | **[Reproducibility Guide](Docs/reproducibility-guide.md)** | Set up the environment and reproduce the reference experiments. |
 | **[Components Guide](Docs/components-guide.md)** | Explore the available Docker components, their functionalities, configuration parameters, and standalone execution instructions. |
 
-**To reproduce the experiments:** Start with the [Reproducibility Guide](Docs/reproducibility-guide.md).
-
 ## Repository Resources
 
 - [Reference Prefect Workflow](Workflows/artificial_data_pipeline.py)
