@@ -170,8 +170,6 @@ synthetic_data_ctgan.parquet
 synthetic_data_copula_gan.parquet
 ```
 
-Evaluation results are also saved in Parquet format.
-
 ## 9. Troubleshooting
 
 | Problem | Suggested solution |
