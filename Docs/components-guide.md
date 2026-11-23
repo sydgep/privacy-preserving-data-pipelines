@@ -4,7 +4,7 @@
 
 Each component is distributed as a Docker image and configured through environment variables. You can run a component on its own; no Prefect installation is needed for the Docker commands below.
 
-The following are the **ten components used by the reference experiment**. For step-by-step instructions on running the reference experiment, see the [Reproducibility Guide](reproducibility-guide.md).
+The following are the **ten components used by the reference experiment**.
 
 ## 1. File Extraction
 
